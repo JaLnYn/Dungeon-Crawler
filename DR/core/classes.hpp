@@ -15,7 +15,6 @@
 class classes:public hero{
 public:
     int armourP = 0;
-    int base = 0;
     int critChance = 0;
     double multiplyer = 0;
     
@@ -41,7 +40,7 @@ public:
         
     }
     samurai(int x,int y):classes("knight.png",x,y){
-        base = 3;
+        atk = 10;
         armourP = 0;
         critChance = 0;
         attackRange = 1;
@@ -58,8 +57,7 @@ class rogue:public classes{
 public:
     
     rogue(int x,int y):classes("Rogue.png",x,y){
-        base = 3;
-        atk = 900;
+        atk = 10;
         armourP = 0;
         critChance = 0;
         attackRange = 1;
@@ -85,7 +83,7 @@ public:
         if(!usingAbil){
             
         }else{
-            sprite.setTextureRect(sf::IntRect((dir*defaultFrames+currentFrame)*(picSize),0,picSize,picSize));
+            
         }
         hero::render(window);
     }
@@ -99,7 +97,6 @@ class medic:public classes{
 public:
     
     medic(int x,int y):classes("sprite thing.png",x,y){
-        base = 3;
         armourP = 0;
         critChance = 0;
         attackRange = 1;
@@ -116,19 +113,43 @@ public:
     
 };
 
+class soldier:public classes{
+    
+public:
+    
+    soldier(int x,int y):classes("soldier.png",x,y){
+        armourP = 0;
+        critChance = 0;
+        attackRange = 10;
+        cdSubtract = 3;
+        abilTimer = 50;
+        abilCD = 50;
+        atk = 3;
+        HP_PT = 10;
+    }
+    
+    bool ability(){
+        if(usingAbil){
+            //implement ability after adding long term effects
+        }
+    }
+};
+
+
+
 class realClass:public classes{
     
 public:
     
     realClass(int x,int y, sf::String path):classes(path,x,y){
-        base = 3;
         armourP = 0;
         critChance = 0;
-        attackRange = 1;
+        attackRange = 10;
         cdSubtract = 3;
         abilTimer = 50;
         abilCD = 50;
-        atk = 900;
+        atk = 3;
+        HP_PT = 10;
         equipBG.setFillColor(sf::Color(150,150,150,255));
     }
     

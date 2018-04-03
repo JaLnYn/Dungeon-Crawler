@@ -10,7 +10,7 @@
 #include "mobs.hpp"
 
 
-enemy::enemy(sf::String path,int x,int y, int bsx, int bsy, int hsx, int hsy, int hos ):entity(path,x,y,2,bsx,bsy,hsx,hsy,hos){
+enemy::enemy(sf::String path,int x,int y, int bsx, int bsy):entity(path,x,y,2,bsx,bsy){
     ani_moveSpd = 1;
     spwnX = x;
     spwnY = y;

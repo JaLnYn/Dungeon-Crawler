@@ -25,6 +25,8 @@
 		E788AADC1E281F56001AF90A /* brick_tiles_1.png in Resources */ = {isa = PBXBuildFile; fileRef = E788AADB1E281F56001AF90A /* brick_tiles_1.png */; };
 		E788AADE1E281F5C001AF90A /* sprite thing.png in Resources */ = {isa = PBXBuildFile; fileRef = E788AADD1E281F5C001AF90A /* sprite thing.png */; };
 		E7B7E2F91F81682300AE3C05 /* weapons.jpg in Resources */ = {isa = PBXBuildFile; fileRef = E7B7E2F81F81682300AE3C05 /* weapons.jpg */; };
+		E7D2AC2C2056E1C800358020 /* mouse.png in Resources */ = {isa = PBXBuildFile; fileRef = E7D2AC2B2056E1C800358020 /* mouse.png */; };
+		E7D2AC41205D873800358020 /* soldier.png in Resources */ = {isa = PBXBuildFile; fileRef = E7D2AC40205D873800358020 /* soldier.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +65,8 @@
 		E788AADD1E281F5C001AF90A /* sprite thing.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sprite thing.png"; path = "resources/sprite thing.png"; sourceTree = "<group>"; };
 		E7B7E2F61F81674900AE3C05 /* WeaponManager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = WeaponManager.hpp; path = core/WeaponManager.hpp; sourceTree = "<group>"; };
 		E7B7E2F81F81682300AE3C05 /* weapons.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = weapons.jpg; path = resources/weapons.jpg; sourceTree = "<group>"; };
+		E7D2AC2B2056E1C800358020 /* mouse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = mouse.png; path = resources/mouse.png; sourceTree = "<group>"; };
+		E7D2AC40205D873800358020 /* soldier.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = soldier.png; path = resources/soldier.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +138,8 @@
 		E788AA9D1E2807E7001AF90A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E7D2AC40205D873800358020 /* soldier.png */,
+				E7D2AC2B2056E1C800358020 /* mouse.png */,
 				E7B7E2F81F81682300AE3C05 /* weapons.jpg */,
 				E75032DF1F6CC4F7005097A6 /* OpenSans-Light.ttf */,
 				E72913F31F6629BE00047B27 /* gui.png */,
@@ -281,7 +287,9 @@
 			files = (
 				E788AAD51E281676001AF90A /* DR-Info.plist in Resources */,
 				E788AADE1E281F5C001AF90A /* sprite thing.png in Resources */,
+				E7D2AC2C2056E1C800358020 /* mouse.png in Resources */,
 				E75032E01F6CC4F7005097A6 /* OpenSans-Light.ttf in Resources */,
+				E7D2AC41205D873800358020 /* soldier.png in Resources */,
 				E72913F21F65DC7C00047B27 /* Rogue.png in Resources */,
 				E72913F41F6629BE00047B27 /* gui.png in Resources */,
 				E76A25721F5E363700D0C4CC /* knight.png in Resources */,

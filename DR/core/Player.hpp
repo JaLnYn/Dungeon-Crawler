@@ -91,6 +91,17 @@ private:
     sf::RectangleShape inv_select;
     sf::RectangleShape wep_select;
     
+    sf::RectangleShape selectedRect;
+    bool red = false;
+    int rectangleSelectSize = 32;
+    
+    sf::Texture CursorTexture;
+    static const int cursorTextureSize = 32;
+    
+    sf::Sprite cursor;
+    static const int cursorSize = 32;
+    
+    sf::RectangleShape selectRect;
 public:
     
     
@@ -99,7 +110,7 @@ public:
     
     
     
-    Player(eManager*eman, hero*h1, hero*h2,hero*h3,hero*h4);
+    Player(eManager*eman, sf::RenderWindow*window, hero*h1, hero*h2,hero*h3,hero*h4);
     void setVision();
     void addToSelected(hero*e);
     void init();
@@ -122,6 +133,9 @@ public:
     int cur_sel_inv = 0;
     int cur_sel_equ = 0;
     bool arrowDown = false;
+    
+    const int moveBoxTimer_MX = 30;
+    int moveBoxTimer = 0;
     
     sf::Sprite potionSprite;
 };

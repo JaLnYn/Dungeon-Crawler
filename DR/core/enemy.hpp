@@ -17,7 +17,7 @@ class enemy: public entity{
     
 public:
     
-    enemy(sf::String,int x,int y,int bsx,int bsy, int hsx, int hsy, int hos);
+    enemy(sf::String,int x,int y,int bsx,int bsy);
     virtual void wander();
     virtual void AI(){
        
@@ -80,7 +80,9 @@ public:
 
     }
     bool tick(sf::RenderWindow *window);
-    
+    int getTeam(){
+        return 1;
+    }
 protected:
     int waitOnWonder = 20;
     int waitWonder = 0;

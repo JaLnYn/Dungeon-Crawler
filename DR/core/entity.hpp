@@ -18,7 +18,7 @@ class entity: public object{
 public:
     std::vector<eManager::node> path;
     
-    entity(sf::String path, int x, int y, int team, int bsX, int bsY, int hsX,int hsY, int hos):object(path, x, y, team,bsX,bsY,hsX,hsY,hos){
+    entity(sf::String path, int x, int y, int team, int bsX, int bsY):object(path, x, y, team,bsX,bsY){
         destination.x = x;
         destination.y = y;
     }
@@ -49,6 +49,11 @@ public:
         
     }
     
+    sf::Vector2i getDes(){
+        return destination;
+        
+    }
+    
     
     void setLock(entity*ent){
         lockedOn = ent;
@@ -69,6 +74,12 @@ public:
             erg-=amount;
             return true;
         }
+    }
+    
+    void heal(int amount){
+        
+        healing = amount;
+        
     }
     
     virtual void initMove(){
@@ -177,31 +188,30 @@ public:
     
     virtual bool tick(sf::RenderWindow*window){
         
-        attackxOffSet = 0;
-        attackyOffSet = 0;
+        if(hp > HP_PT){
+            hp = HP_PT;
+        }
         
-        if(currentFrameTime>frameSwitchTime){
-            currentFrameTime=0;
-            currentFrame++;
-            if(currentFrame>=defaultFrames){
-                currentFrame = 0;
+        
+        if(moveing){
+            if(currentFrameTime>frameSwitchTime){
+                currentFrameTime=0;
+                currentFrame++;
+                if(currentFrame>=defaultFrames){
+                    currentFrame = 0;
+                }
+            }else{
+                currentFrameTime++;
             }
-        }else{
-            currentFrameTime++;
+            
+            if(attackWaitTime>0){
+                attackWaitTime--;
+            }
         }
         
-        if(attackWaitTime>0){
-            attackWaitTime--;
-        }
         
-        
-        sprite.setTextureRect(sf::IntRect((currentAction*defaultFrames+currentFrame)*(picSize),(dir+1)*picSize,picSize,picSize));
+        sprite.setTextureRect(sf::IntRect((currentAction*defaultFrames+currentFrame)*(picSize),(dir)*picSize,picSize,picSize));
         return false;
-    }
-    
-    virtual bool attackPhase(){
-        
-        return true;
     }
     
     
@@ -215,6 +225,7 @@ public:
     }
     
     virtual void hurt(int dmg){
+        
         healing = 0;
         hp-=dmg;
         if(hp<0){
@@ -400,6 +411,17 @@ public:
     }
     void setLockOn(entity*l){
         lockedOn = l;
+        if(lockedOn != nullptr){
+            //lookhere
+            destination = sf::Vector2i(lockedOn->getX(),lockedOn->getY());
+            fpath(destination);
+            if(checkIfAttackable()){
+                
+            }else{
+                initMove();
+            }
+        }
+        
     }
     virtual int getGoodGuy(){
         return goodGuy;
@@ -410,41 +432,52 @@ public:
     virtual int getAtk(){
         return atk;
     }
+    
+    bool checkIfAttackable(){
+        if(cmd>2 && getLockOn()!=nullptr && moveing == false ){
+            
+            
+            int xdis = getLockOn()->getX()-getX();
+            int ydis = getLockOn()->getY()-getY();
+            
+            return abs(ydis) <= attackRange&&abs(xdis) <= attackRange && eman->lineCollision(createLine(getLockOn()->getX()+getLockOn()->getXMove(), getLockOn()->getY()+getLockOn()->getYMove()));
+        }
+        return false;
+    }
+    
     virtual bool attack(){
         
         
         
-        if(cmd>2 && getLockOn()!=nullptr && moveing == false){
-            int xdis = getLockOn()->getX()-getX();
+        if (checkIfAttackable()) {
             
-            int ydis = getLockOn()->getY()-getY();
-            if (abs(ydis) <= attackRange&&abs(xdis) <= attackRange) {
+            if(lockedOn->x > x){
+                dir = 0;
+            }else if(lockedOn->x < x){
+                dir = 1;
+            }
+            if(attackWaitTime == 0){
                 
-                if(lockedOn->x > x){
-                    dir = 0;
-                }else if(lockedOn->x < x){
-                    dir = 1;
-                }
-                if(attackWaitTime == 0){
-                    attackxOffSet = (lockedOn->getX()+lockedOn->getXMove()-getX()-getXMove())*eman->getTileSizeX()/4;
-                    attackyOffSet = (lockedOn->getY()+lockedOn->getYMove()-getYMove()-getY())*eman->getTileSizeY()/4;
-                    getLockOn()->hurt(getAtk()+currentWeapon.getATK());
-                    attackWaitTime = currentWeapon.getTime()+2;
-                    
-                }else if (attackWaitTime<3){
-                    attackxOffSet = (lockedOn->getX()+lockedOn->getXMove()-getX()-getXMove())*eman->getTileSizeX()/4;
-                    attackyOffSet = (lockedOn->getY()+lockedOn->getYMove()-getYMove()-getY())*eman->getTileSizeY()/4;
-                }else if (attackWaitTime < 6){
-                    attackxOffSet = (lockedOn->getX()+lockedOn->getXMove()-getX()-getXMove())*eman->getTileSizeX()/8;
-                    attackyOffSet = (lockedOn->getY()+lockedOn->getYMove()-getYMove()-getY())*eman->getTileSizeY()/8;
-                }
+                getLockOn()->hurt(getAtk());//damage enemy here
+                attackWaitTime = amountOfAttackFrames;
                 
-                moveing = false;
-                return true;
+            }else if (attackWaitTime<2){
+                currentFrame = 1;
+            }else if (attackWaitTime < 4){
+                currentFrame = 2;
+            }else{
+                currentFrame = 0;
             }
             
-            
+            if(attackWaitTime>0){
+                attackWaitTime--;
+            }
+            moveing = false;
+            return true;
         }
+        
+        
+        
         return false;
     }
     weapon * getCurrentWeapon(){
@@ -453,6 +486,8 @@ public:
     void setWeapon(weapon wep){
         currentWeapon = wep;
     }
+    
+    virtual int getTeam() = 0;
 protected:
     
     sf::Vector2i destination;
@@ -468,7 +503,6 @@ protected:
     int currentFrameTime = 0;
     int currentAction = 0;
     int defaultFrames = 4;
-    const int totalFrames[4] = {8,8,8,8};
     int attackWaitTime = 0;
     
     bool moveing = false;
@@ -489,7 +523,7 @@ protected:
     int healing = 0;
     double ani_moveSpd = 1;
     int ani_moveFrames = 1;
-    int amountOfAttackFrames = 2;
+    int amountOfAttackFrames = 30;
     int damage_frame = 1;
 };
 #endif /* entity_hpp */

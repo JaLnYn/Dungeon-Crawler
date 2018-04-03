@@ -29,7 +29,7 @@ public:
     }
     virtual void render(sf::RenderWindow*window);
     void lvlUP();
-    void heal(int amount);
+    
     
     void renderWepEquip(sf::RenderWindow * window,int i);
     
@@ -40,7 +40,9 @@ protected:
     
     virtual bool searchLock();
     
-    
+    int getTeam(){
+        return 0;
+    }
 protected:
     const int lockRange[7] = {3,5,7,7,7,5,3};
     const int lockArraySize = 7;

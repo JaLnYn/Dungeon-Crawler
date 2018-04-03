@@ -8,7 +8,7 @@
 
 #include "Player.hpp"
 
-Player::Player(eManager*eman,hero*h1,hero*h2,hero*h3,hero*h4){
+Player::Player(eManager*eman, sf::RenderWindow*window,hero*h1,hero*h2,hero*h3,hero*h4){
     h.push_back(h1);h.push_back(h2);h.push_back(h3);h.push_back(h4);
     
     this->eman = eman;
@@ -28,6 +28,11 @@ Player::Player(eManager*eman,hero*h1,hero*h2,hero*h3,hero*h4){
     inv_select.setSize(sf::Vector2f(42,44));
     wep_select.setSize(sf::Vector2f(44,42));
     
+    CursorTexture.loadFromFile(resourcePath()+"mouse.png");
+    cursor.setTexture(CursorTexture);
+    
+    
+    window->setMouseCursorVisible(false);
     
     
 }
@@ -56,6 +61,17 @@ void Player::addToSelected(hero*e){
 void Player::init(){
     initX=0;
     initY=0;
+    
+    selectRect.setOutlineColor(sf::Color::Green);
+    selectRect.setOutlineThickness(3);
+    selectRect.setFillColor(sf::Color::Transparent);
+    
+    
+        
+    selectedRect.setOutlineColor(sf::Color::Green);
+    selectedRect.setOutlineThickness(3);
+    selectedRect.setFillColor(sf::Color::Transparent);
+    selectedRect.setSize(sf::Vector2f(rectangleSelectSize, rectangleSelectSize));
     
     int mapSpriteSize = 64;
     mapsprite.setTextureRect(sf::IntRect(0,0,64,64));
@@ -385,10 +401,11 @@ void Player::tick(sf::RenderWindow*window){
         for (int i = 0; i< selected.size();i++) {
             entity*e = selected[i];
             //&&eman->moveIn(goToX, goToY)
-            e->fpath(sf::Vector2i(e->getX(),e->getY()));
+            e->fpath(sf::Vector2i(e->getX()+e->getXMove(),e->getY()+e->getYMove()));
             e->initMove();
             e->setCMD(0);
             e->setLock(nullptr);
+            moveBoxTimer = 0;
         }
     }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         //holD
@@ -399,6 +416,7 @@ void Player::tick(sf::RenderWindow*window){
             e->initMove();
             e->setCMD(4);
             e->setLock(nullptr);
+            moveBoxTimer = 0;
         }
     }else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)){
         //drink Potion
@@ -434,6 +452,27 @@ void Player::tick(sf::RenderWindow*window){
 //            e->setLock(nullptr);
 //        }
 //    }
+    ///////////////////
+    //mouse control here
+    /////////////////
+    cursor.setTextureRect(sf::IntRect(0,0,cursorTextureSize,cursorTextureSize));
+    for (int i = 0; i < eman->getAmoutOfEnt(); i++) {
+        
+        if(eman->getEnt(i)->getSee()){
+            if(eman->getEnt(i)->checkPointInterSect(mouseX, mouseY)){
+                if(eman->getEnt(i)->getTeam() == 0){
+                    cursor.setTextureRect(sf::IntRect(cursorTextureSize*2,0,cursorTextureSize,cursorTextureSize));
+                    break;
+                }else{
+                    cursor.setTextureRect(sf::IntRect(cursorTextureSize,0,cursorTextureSize,cursorTextureSize));
+                    break;
+                }
+            }
+        }
+    }
+    
+    
+    cursor.setPosition(mouseX-cursorSize/2, mouseY-cursorSize/2);
     
     if(sf::Mouse::getPosition().y-sf::VideoMode::getDesktopMode().height > guiStart&&sf::Mouse::getPosition().x < mapGuiEnd && sf::Mouse::isButtonPressed(sf::Mouse::Left)){
         
@@ -444,7 +483,15 @@ void Player::tick(sf::RenderWindow*window){
     }else if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
         bool hasSelection = false;
         for (int i = 0; i<eman->getAmoutOfEnt(); i++) {
-            entity*e = eman->getEnt(mouseX/eman->getTileSizeX(),mouseY/eman->getTileSizeY());
+            // the ent being clicked gets it
+            entity*e;
+            e = nullptr;
+            for (int i = 0; i < eman->getAmoutOfEnt(); i++) {
+                if(eman->getEnt(i)->checkPointInterSect(mouseX, mouseY)){
+                    e = eman->getEnt(i);
+                    break;
+                }
+            }
             
             if(e!=nullptr){
                 if(e->getGoodGuy()==2){
@@ -454,7 +501,6 @@ void Player::tick(sf::RenderWindow*window){
                         entity*a = selected[i];
                         //&&eman->moveIn(goToX, goToY)
                         a->fpath(sf::Vector2i(mouseX/eman->getTileSizeX(),mouseY/eman->getTileSizeY()));
-                        a->initMove();
                         a->setCMD(3);
                         a->setLockOn(e);
                     }
@@ -481,6 +527,9 @@ void Player::tick(sf::RenderWindow*window){
                 e->initMove();
                 e->setCMD(2);
                 e->setLockOn(nullptr);
+                moveBoxTimer = moveBoxTimer_MX;
+                red = false;
+                
             } 
         }
         
@@ -489,12 +538,21 @@ void Player::tick(sf::RenderWindow*window){
         
         
         if(cmd == 5){
+            moveBoxTimer = moveBoxTimer_MX;
+            red = true;
             cmdClick = true;
             //attack
             cmd = 0;
             bool hasSelection = false;
-            
-            entity*e = eman->getEnt(mouseX/eman->getTileSizeX(),mouseY/eman->getTileSizeY());
+            entity * e;
+            // the ent being clicked gets it
+            e = nullptr;
+            for (int i = 0; i < eman->getAmoutOfEnt(); i++) {
+                if(eman->getEnt(i)->checkPointInterSect(mouseX, mouseY)){
+                    e = eman->getEnt(i);
+                    break;
+                }
+            }
             if(e!=nullptr){
                 
                 hasSelection = true;
@@ -502,7 +560,6 @@ void Player::tick(sf::RenderWindow*window){
                 for (int i = 0; i< selected.size();i++) {
                     entity*a = selected[i];
                     //&&eman->moveIn(goToX, goToY)
-                    
                     a->setCMD(3);
                     a->setLockOn(e);
                 }
@@ -556,38 +613,15 @@ void Player::tick(sf::RenderWindow*window){
                 selected.clear();
             }
             
-            //        if (abs(initX - mouseX) < eman->getTileSizeX() && abs(initY - mouseY) < eman->getTileSizeY()) {
-            //
-            //            // make clicking latter
-            //
-            //            entity*e = eman->getIntersect(startX, startY, endX, endY);
-            //            if (e != nullptr) {
-            //                hero * h;
-            //                if((h = dynamic_cast<hero * >(e))){
-            //                    addToSelected(h);
-            //                }
-            //
-            //            }
-            //
-            //        }else {
+           
             
             
-            for (int y = startY/eman->getTileSizeY(); y < endY/eman->getTileSizeY()+1; y++) {
-                for (int x = startX/eman->getTileSizeX(); x < endX/eman->getTileSizeX()+1; x++) {
-                    for (int i = 0; i < h.size(); i++) {
-                        
-                        
-                        int entX = ((h[i]->getX())+(h[i]->getXMove()));
-                        int entY = ((h[i]->getY())+(h[i]->getYMove()));
-                        if(entX==x && entY==y){
-                            
-                            addToSelected(h[i]);
-                            
-                        }
-                    }
+            for (int i = 0; i < h.size(); i++) {
+                if(h[i]->checkInterSect(startX, startY  , endX  , endY)){
+                    addToSelected(h[i]);
                 }
             }
-            //}
+            
             
             
         }else{
@@ -600,6 +634,7 @@ void Player::tick(sf::RenderWindow*window){
 }
 
 void Player::renderGui(sf::RenderWindow * window ){
+    
     
     backGround.setPosition(window->mapPixelToCoords(sf::Vector2i(0, eman->getRoom()->getYOFF()-64-32+46)));
     window->draw(backGround);
@@ -626,6 +661,26 @@ void Player::renderGui(sf::RenderWindow * window ){
     for (int i = 0; i < h.size(); i++) {
         wepMan.renderWep(window, h[i]->getCurrentWeapon()->getIMGX(), h[i]->getCurrentWeapon()->getIMGX(),0, eman->getRoom()->getYOFF()-64-32*4-(32+2)*2*i-8);
     }
+    
+    eman->generateMap(window);
+    
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)&& haveBeenClicked){
+        
+        selectRect.setSize(sf::Vector2f(endX-startX,endY-startY));
+        selectRect.setPosition(startX, startY);
+        //
+        //        for (int x = startX/eman->getTileSizeX(); x<endX/eman->getTileSizeX()+1; x++) {
+        //            for (int y = startY/eman->getTileSizeY(); y<endY/eman->getTileSizeY()+1; y++) {
+        //                feildSprite.setPosition(x*eman->getTileSizeX(), y*eman->getTileSizeY());
+        //                window->draw(feildSprite);
+        //            }
+        //        }
+        window->draw(selectRect);
+    }
+    
+    
+    window->draw(cursor);
+    
 }
 
 void Player::setVision(){
@@ -650,7 +705,12 @@ int Player::getSize(){
 }
 
 entity * Player::getHero(int i){
-    return h[i];
+    if(h.size()!=0){
+        return h[i];
+    }else{
+        return nullptr;
+    }
+    
 }
 
 void Player::removeH(entity *hero){
@@ -683,27 +743,37 @@ void Player::lvUp(){
 }
 void Player::renderGroundGui(sf::RenderWindow*window){
     
-    for (int i = 0; i < h.size(); i++) {
-        selectSpriteInner.setPosition(h[i]->getX()*eman->getTileSizeX()+h[i]->xOff()+eman->getTileSizeX()/2-16, h[i]->getY()*eman->getTileSizeY()+h[i]->yOff());
-        window->draw(selectSpriteInner);
-    }
+    selectedRect.setOutlineColor(sf::Color::Green);
     
     for (int i = 0; i < selected.size(); i++) {
-        selectSprite.setPosition(selected[i]->getX()*eman->getTileSizeX()+selected[i]->xOff()+eman->getTileSizeX()/2-16, selected[i]->getY()*eman->getTileSizeY()+selected[i]->yOff());
-        window->draw(selectSprite);
+        selectedRect.setPosition(selected[i]->getX()*eman->getTileSizeX()+selected[i]->xOff()+eman->getTileSizeX()/2-rectangleSelectSize/2, selected[i]->getY()*eman->getTileSizeY()+selected[i]->yOff()+eman->getTileSizeY()/2-rectangleSelectSize/2);
+        window->draw(selectedRect);
     }
     
-    
-    
-    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)&&(endX-startX)/eman->getTileSizeX()<15&&(endY-startY)/eman->getTileSizeY()<15){
-        
-        for (int x = startX/eman->getTileSizeX(); x<endX/eman->getTileSizeX()+1; x++) {
-            for (int y = startY/eman->getTileSizeY(); y<endY/eman->getTileSizeY()+1; y++) {
-                feildSprite.setPosition(x*eman->getTileSizeX(), y*eman->getTileSizeY());
-                window->draw(feildSprite);
-            }
+    if(moveBoxTimer > 0 ){
+        if(red == true){
+            selectedRect.setOutlineColor(sf::Color::Red);
+        }else{
+            selectedRect.setOutlineColor(sf::Color::Green);
         }
+        //draw something on the ground for a second
+        
+        selectedRect.setPosition(selected[0]->getDes().x*eman->getTileSizeX()+eman->getTileSizeX()/2-rectangleSelectSize/2, selected[0]->getDes().y*eman->getTileSizeY()+eman->getTileSizeY()/2-rectangleSelectSize/2);
+        window->draw(selectedRect);
+        moveBoxTimer--;
     }
+    selectedRect.setOutlineColor(sf::Color::Red);
+    for (int i = 0; i < selected.size(); i++) {
+        if(selected[i]->getLockOn()!=nullptr){
+            selectedRect.setPosition(selected[i]->getLockOn()->getX()*eman->getTileSizeX()+selected[i]->getLockOn()->xOff()+eman->getTileSizeX()/2-rectangleSelectSize/2, selected[i]->getLockOn()->getY()*eman->getTileSizeY()+selected[i]->getLockOn()->yOff()+eman->getTileSizeY()/2-rectangleSelectSize/2);
+            window->draw(selectedRect);
+        }
+        
+        
+        
+    }
+    
+    
     
     
     

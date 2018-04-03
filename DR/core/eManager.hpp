@@ -58,6 +58,7 @@ public:
     struct sorter;
     
     
+    
     void setRoom(room*);
     
     /**
@@ -79,7 +80,7 @@ public:
     Return:
      void
     **/
-    void init(room*);
+    void init(room*,  sf::RenderWindow*window);
     
     /**
     Purpose:
@@ -273,6 +274,8 @@ public:
      return: none
      **/
     void generateMap(sf::RenderWindow * window);
+    
+    bool lineCollision(Line line);
     
     //void addEnemy(enemy* e);
     

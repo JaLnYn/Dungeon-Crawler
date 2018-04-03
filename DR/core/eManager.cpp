@@ -32,7 +32,6 @@ struct eManager::sorter{
 
 void eManager::setRoom(room*room){
     this->rm = room;
-    printf("hi");
 }
 
 int eManager::getTileSizeX(){
@@ -119,19 +118,19 @@ int eManager::getAmoutOfEnt(){
     return ents.size();
 }
 
-void eManager::init(room*room){
+void eManager::init(room*room, sf::RenderWindow*window){
     
     dots[0].setFillColor(sf::Color::White);
     dots[1].setFillColor(sf::Color::Green);
     dots[2].setFillColor(sf::Color::Red);
     
-    heros.push_back(new rogue(0,0));
-    heros.push_back(new realClass(0,0,"Rogue.png"));
-    heros.push_back(new realClass(0,0,"Rogue.png"));
-    heros.push_back(new realClass(0,0,"Rogue.png"));
+    heros.push_back(new soldier(0,0));
+    heros.push_back(new soldier(0,0));
+    heros.push_back(new soldier(0,0));
+    heros.push_back(new soldier(0,0));
     
     
-    plr = new Player(this,heros[0],heros[1],heros[2],heros[3]);
+    plr = new Player(this,window,heros[0],heros[1],heros[2],heros[3]);
     setRoom(room);
     plr->SetGuiStart();
     tileShader.setSize(sf::Vector2f(getTileSizeX(),getTileSizeY()));
@@ -292,6 +291,15 @@ std::vector<eManager::node> eManager::pathFind(entity*ent,sf::Vector2i go){
     }
     
     return returnThis;
+}
+
+bool eManager::lineCollision(Line line){
+    for (int i = 0; i < line.getSize(); i++) {
+        if(getRoom()->isSolid(line.getCoord(i).x, line.getCoord(i).y)){
+            return false;
+        }
+    }
+    return true;
 }
 
 int eManager::openNodeFirst (int id,entity*ent, sf::Vector2i go,std::vector<node>*nodes){

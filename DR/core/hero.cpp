@@ -12,7 +12,7 @@
 
 
 
-hero::hero(sf::String path,int x,int y):entity(path,x,y,1,24,30,16,16,30+16){
+hero::hero(sf::String path,int x,int y):entity(path,x,y,1,16,30){
     ani_moveSpd = 2;
     hpBlackGround.setSize(sf::Vector2f(hpBarSizeX,hpBarSizeY*2));
     energyBar.setSize(sf::Vector2f(hpBarSizeX,hpBarSizeY));
@@ -28,9 +28,7 @@ void hero::renderWepEquip(sf::RenderWindow *window, int i){
     window->draw(equipBG);
 }
 
-void hero::heal(int rate){
-    healing = rate;
-}
+
 void hero::init(eManager*e){
     entity::init(e);
     sprite.setTextureRect(sf::IntRect(0,0,picSize,picSize));
@@ -110,7 +108,7 @@ bool hero::searchLock(){
 
 bool hero::tick(sf::RenderWindow *window){
     entity::tick(window);
-    hp = HP_PT;
+    //hp = HP_PT;
     if(healing>0){
         
         if(hp+healing>HP_PT){
@@ -138,7 +136,7 @@ bool hero::tick(sf::RenderWindow *window){
     if(stopForThisTurn){
         stopForThisTurn = false;
     }else if(attack()){
-        currentAction = 0;
+        currentAction = 1;
     }else if (!moveing) {
         if(cmd == 4||cmd==0){
             currentAction = 0;
@@ -163,10 +161,11 @@ bool hero::tick(sf::RenderWindow *window){
             }
         }
     }else{
-        currentAction = 1;
+        currentAction = 2;
         movePhase();
         return true;
     }
+    
     return false;
 }
 

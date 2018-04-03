@@ -15,11 +15,10 @@
 class mobs:public enemy{
 public:
     int armourP = 0;
-    int base = 0;
     int critChance = 0;
     double multiplyer = 0;
     
-    mobs(sf::String s, int x,int y,int bsx, int bsy, int hsx, int hsy,int hos):enemy(s,x,y,bsx,bsy,hsx,hsy,hos){
+    mobs(sf::String s, int x,int y,int bsx, int bsy, int hsx, int hsy,int hos):enemy(s,x,y,bsx,bsy){
         
     }
     
@@ -33,6 +32,8 @@ public:
         viewDistance = 5;
         cmd = 6;
         ani_moveSpd = 1;
+        HP_PT = 10;
+        atk = 1;
         
         
     }
@@ -171,6 +172,8 @@ public:
         cmd = 6;
         ani_moveSpd = 1.5;
         attackRange = 5;
+        HP_PT = 10;
+        atk = 1;
     }
     
     
@@ -234,6 +237,8 @@ public:
         cmd = 6;
         ani_moveSpd = 1;
         attackRange = 1;
+        HP_PT = 10;
+        atk = 1;
     }
     
     
@@ -254,9 +259,9 @@ public:
         cmd = 6;
         ani_moveSpd = 3;
         attackRange = 1;
-        
-        
+        hp = 10;
     }
+    
     void AI(){
         if(lockedOn == nullptr){
             entity*e = eman->getPlr()->getHero(rand()%eman->getPlr()->getSize());
@@ -308,6 +313,8 @@ public:
         cmd = 6;
         ani_moveSpd = 1;
         attackRange = 1;
+        HP_PT = 10;
+        atk = 1;
         
     }
     

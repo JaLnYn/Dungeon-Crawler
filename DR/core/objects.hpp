@@ -19,12 +19,12 @@
 class object{
 public:
     
-    object(sf::String path, int x, int y, int team, int bodySizeX,int bodySizeY ,int headX, int headY, int headOffset){
+    object(sf::String path, int x, int y, int team, int bodySizeX,int bodySizeY){
         goodGuy = team;
+        hp = HP_PT;
         spriteSheet.loadFromFile(resourcePath()+path);
         this->x = x;
         this->y = y;
-        this->headOffSet = headOffset;
         sprite.setTexture(spriteSheet);
         double scale = (double)renderSize/picSize;
         sprite.setScale(scale, scale);
@@ -47,15 +47,11 @@ public:
         bodyHitBox.setOutlineColor(sf::Color::Green);
         bodyHitBox.setFillColor(sf::Color(255,255,255,150));
         bodyHitBox.setSize(sf::Vector2f(bodySizeX, bodySizeY));
-        std::cout<<bodyHitBox.getSize().y<<" "<<team<<std::endl;
         bodyHitBox.setOrigin(bodySizeX/2, bodySizeY);
         
-        headHitBox.setOutlineColor(sf::Color::Red);
-        headHitBox.setFillColor(sf::Color(255,255,255,150));
-        headHitBox.setSize(sf::Vector2f(headX,headY));
-        headHitBox.setOrigin(headX/2, headY/2);
         
-        sprite.setOrigin(picSize/2, (float)picSize*19/20);
+        sprite.setOrigin(picSize/2, (float)picSize*3/4);
+        bodyHitBox.setOrigin(bodySizeX/2, (float)bodySizeY*3/4);
     }
     
     int getX(){
@@ -69,20 +65,22 @@ public:
     // drawing onto the display
     
     virtual void render(sf::RenderWindow*window){
-        bodyHitBox.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet+attackxOffSet, y*eman->getTileSizeY()+eman->getTileSizeX()/2+yOffSet+attackyOffSet);
-        headHitBox.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet+attackxOffSet, y*eman->getTileSizeY()+eman->getTileSizeX()/2+yOffSet+attackyOffSet);
+        
         hpBar.setSize(sf::Vector2f(hpBarSizeX*hp/HP_PT,hpBarSizeY));
         //hpBar
         hpBackGround.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet-hpBarSizeX/2-1, y*eman->getTileSizeY()+eman->getTileSizeY()/2+yOffSet+3-1+barOffSet);
         hpBlackGround.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet-hpBarSizeX/2, y*eman->getTileSizeY()+eman->getTileSizeY()/2+yOffSet+3+barOffSet);
         hpBar.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet-hpBarSizeX/2, y*eman->getTileSizeY()+eman->getTileSizeY()/2+yOffSet+3+barOffSet);
         
-        sprite.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet+attackxOffSet, y*eman->getTileSizeY()+eman->getTileSizeX()/2+yOffSet+attackyOffSet);
         
-        bodyHitBox.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet+attackxOffSet, y*eman->getTileSizeY()+eman->getTileSizeY()/2+yOffSet+attackyOffSet);
+        
+        sprite.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet, y*eman->getTileSizeY()+eman->getTileSizeX()/2+yOffSet);
+        
+        
+        
+        bodyHitBox.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet, y*eman->getTileSizeY()+eman->getTileSizeY()/2+yOffSet);
         window->draw(sprite);
         
-        headHitBox.setPosition(x*eman->getTileSizeX()+eman->getTileSizeX()/2+xOffSet+attackxOffSet, y*eman->getTileSizeY()+eman->getTileSizeY()/2+yOffSet+attackyOffSet-headOffSet);
         
 
         window->draw(hpBackGround);
@@ -90,7 +88,7 @@ public:
         window->draw(hpBlackGround);
         window->draw(hpBar);
         
-        window->draw(headHitBox);
+        
         window->draw(bodyHitBox);
         
         
@@ -128,8 +126,24 @@ public:
         int yStart = y*eman->getTileSizeY() + eman->getTileSizeY()/2 - bodyHitBox.getSize().y + yOffSet;
         int yEnd = y*eman->getTileSizeY() + eman->getTileSizeY()/2 + yOffSet;
         
-        if((xStart < ix && xEnd > ix)||(xStart < ex && xEnd > ex)){
-            if((yStart < iy && yEnd > iy)||(yStart < ey && yEnd > ey)){
+        if(xStart < ex && xEnd > ix){
+            if(yStart < ey && yEnd > iy){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    bool checkPointInterSect(int nx, int ny){
+        int xStart = x*eman->getTileSizeX() + eman->getTileSizeX()/2 - bodyHitBox.getSize().x/2 + xOffSet;
+        int xEnd = x*eman->getTileSizeX() + eman->getTileSizeX()/2 + bodyHitBox.getSize().x/2 + xOffSet;
+        
+        int yStart = y*eman->getTileSizeY() + eman->getTileSizeY()/2 - bodyHitBox.getSize().y + yOffSet;
+        int yEnd = y*eman->getTileSizeY() + eman->getTileSizeY()/2 + yOffSet;
+        
+        if(xStart < nx && xEnd > nx){
+            if(yStart < ny && yEnd > ny){
+                
                 return true;
             }
         }
@@ -142,11 +156,11 @@ public:
 protected:
     int x = 1;
     int y = 1;
-    const int picSize = 64;
+    const int picSize = 32;
     const int renderSize = 64;
     
-    const int picOffsetX = 32;
-    const int picOffsetY = 32;
+    const int picOffsetX = 16;
+    const int picOffsetY = 16;
     int hpBarSizeX = 32;
     int hpBarSizeY = 5;
     
@@ -168,8 +182,6 @@ protected:
     int headOffSet = 0;
     double xOffSet = 0;
     double yOffSet = 0;
-    double attackxOffSet = 0;
-    double attackyOffSet = 0;
     int phase = 0;
     bool see = 0;
     bool dead = false;
@@ -186,7 +198,7 @@ protected:
     int xMove = 0;
     int yMove = 0;
     
-    sf::RectangleShape headHitBox;
+    
     sf::RectangleShape bodyHitBox;
     
 private:

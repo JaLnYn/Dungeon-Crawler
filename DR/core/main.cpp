@@ -14,7 +14,7 @@ int main(int argc, char **argv){
     window_di.x = sf::VideoMode::getDesktopMode().width;
     window_di.y = sf::VideoMode::getDesktopMode().height;
     sf::RenderWindow window(sf::VideoMode(window_di.x, window_di.y), "SFML window",sf::Style::Fullscreen);
-    window.setFramerateLimit(55);
+    window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
     
     

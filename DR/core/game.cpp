@@ -37,7 +37,7 @@ void game::changeRoom(int x, sf::RenderWindow*window){
 
 void game::init(sf::RenderWindow*window){
     generate();
-    eman.init(&rm);
+    eman.init(&rm,window);
     changeRoom(0,window);
     
 }
@@ -69,5 +69,5 @@ void game::render(sf::RenderWindow*window){
     eman.render(window,&cam);
     
     eman.getPlr()->renderGui(window);
-    eman.generateMap(window);
+    
 }
